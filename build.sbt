@@ -46,6 +46,7 @@ lazy val scalaMultiPageForms = (project in file("."))
     commonSettings,
     libraryDependencies ++= Vector(
       "com.chuusai" %% "shapeless" % "2.3.3",
+      "org.typelevel" %% "cats-core" % "2.13.0",
       "org.scalatest" %% "scalatest" % "3.2.13" % Test
     ),
     publish / skip := true
