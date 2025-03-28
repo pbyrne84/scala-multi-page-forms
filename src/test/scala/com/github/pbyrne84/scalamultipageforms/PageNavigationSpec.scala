@@ -11,16 +11,17 @@ class PageNavigationSpec extends AnyFreeSpecLike {
   "calculateNextPage" - {
 
     "should navigate from the start page to" - {
+      val startPageOnlyAnswered = NonEmptyList.one(StartPage)
       "SecondPageA when the first option was selected" in {
-        pageNavigation.calculateNextPage(NonEmptyList.one(StartPage), StartPageValues(1)) shouldBe Right(SecondPageA)
+        pageNavigation.calculateNextPage(startPageOnlyAnswered, StartPageValues(1)) shouldBe Right(SecondPageA)
       }
 
       "SecondPageB when the second option was selected" in {
-        pageNavigation.calculateNextPage(NonEmptyList.one(StartPage), StartPageValues(2)) shouldBe Right(SecondPageB)
+        pageNavigation.calculateNextPage(startPageOnlyAnswered, StartPageValues(2)) shouldBe Right(SecondPageB)
       }
 
       "ThirdPageA, skipping the SecondPages when the third option was selected" in {
-        pageNavigation.calculateNextPage(NonEmptyList.one(StartPage), StartPageValues(3)) shouldBe Right(ThirdPageA)
+        pageNavigation.calculateNextPage(startPageOnlyAnswered, StartPageValues(3)) shouldBe Right(ThirdPageA)
       }
 
     }
