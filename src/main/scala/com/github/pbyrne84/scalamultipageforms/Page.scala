@@ -1,13 +1,13 @@
 package com.github.pbyrne84.scalamultipageforms
 
-sealed trait Page {}
+sealed trait Page
 case object StartPage extends Page
 case object SecondPageA extends Page
 case object SecondPageB extends Page
 case object ThirdPageA extends Page
 case object ThirdPageB extends Page
-case object ThirdPageC extends Page
-case object ThirdPageD extends Page
+case object FourthPageA extends Page
+case object FourthPageB extends Page
 
 case object Finished extends Page
 
@@ -19,6 +19,38 @@ sealed trait IntValue extends PageValues {
   val value: Int
 }
 
+sealed trait StringValue extends PageValues {
+  val value: String
+}
+
+sealed trait MultiStringStringValue extends PageValues {
+  val values: List[String]
+}
+
+object StartPageValues {
+  private val validOptions = List(1, 2, 3)
+
+  def validated(value: Int): Either[String, StartPageValues] = {
+    if (validOptions.contains(value)) {
+      Right(StartPageValues(value))
+    } else {
+      Left(s"Invalid StartPageValues value $value, valid values ${validOptions.mkString(", ")}")
+    }
+  }
+}
+
 case class StartPageValues(value: Int) extends IntValue {
   override val page: Page = StartPage
+}
+
+case class SecondPageAValues(value: String) extends StringValue {
+  override val page: Page = SecondPageA
+}
+
+case class SecondPageBValues(value: String) extends StringValue {
+  override val page: Page = SecondPageB
+}
+
+case class ThirdPageAValues(values: List[String]) extends MultiStringStringValue {
+  override val page: Page = ThirdPageA
 }
