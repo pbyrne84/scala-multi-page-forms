@@ -30,9 +30,21 @@ sealed trait MultiStringStringValue extends PageValues {
   val values: List[String]
 }
 
-object StartPageValues {
+sealed trait JsonPageValues {
+  protected val discriminator: String
+
+  protected def createSingleValueEncoder[A <: PageValues](valueCall: (A) => Json) =
+    new Encoder[A] {
+      override def apply(startPageValues: A): Json = JsonObject(
+        "type" -> Json.fromString(discriminator),
+        "value" -> valueCall(startPageValues)
+      ).toJson
+    }
+}
+
+object StartPageValues extends JsonPageValues {
   private val validOptions = List(1, 2, 3)
-  private val discriminator = "startPage"
+  protected val discriminator = "startPage"
 
   def validated(value: Int): Either[String, StartPageValues] = {
     if (validOptions.contains(value)) {
@@ -42,12 +54,8 @@ object StartPageValues {
     }
   }
 
-  implicit val encodeStartPageValues: Encoder[StartPageValues] = new Encoder[StartPageValues] {
-    override def apply(startPageValues: StartPageValues): Json = JsonObject(
-      "type" -> Json.fromString(discriminator),
-      "value" -> Json.fromInt(startPageValues.value)
-    ).toJson
-  }
+  implicit val encodeStartPageValues: Encoder[StartPageValues] =
+    createSingleValueEncoder((startPageValues: StartPageValues) => Json.fromInt(startPageValues.value))
 
   implicit val decodeStartPageValues: Decoder[StartPageValues] = new Decoder[StartPageValues] {
     override def apply(c: HCursor): Result[StartPageValues] = {
