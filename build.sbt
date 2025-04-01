@@ -41,12 +41,15 @@ lazy val commonSettings = Seq(
     .value
 )
 
+val circeVersion = "0.14.12"
 lazy val scalaMultiPageForms = (project in file("."))
   .settings(
     commonSettings,
     libraryDependencies ++= Vector(
       "com.chuusai" %% "shapeless" % "2.3.3",
       "org.typelevel" %% "cats-core" % "2.13.0",
+      "io.circe" %% "circe-core" % circeVersion,
+      "io.circe" %% "circe-parser" % circeVersion,
       "org.scalatest" %% "scalatest" % "3.2.13" % Test
     ),
     publish / skip := true

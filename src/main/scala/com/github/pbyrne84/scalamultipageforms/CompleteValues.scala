@@ -1,6 +1,12 @@
 package com.github.pbyrne84.scalamultipageforms
 
-object CompleteValues {}
+object CompleteValues {
+
+  def toJson(completeValues: CompleteValues) = {
+
+  }
+
+}
 
 case class CompleteValues(answers: List[PageValues]) {
 

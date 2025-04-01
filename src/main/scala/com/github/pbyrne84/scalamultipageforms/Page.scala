@@ -1,5 +1,8 @@
 package com.github.pbyrne84.scalamultipageforms
 
+import io.circe.Decoder.Result
+import io.circe.{Decoder, DecodingFailure, Encoder, FailedCursor, HCursor, Json, JsonObject}
+
 sealed trait Page
 case object StartPage extends Page
 case object SecondPageA extends Page
@@ -29,12 +32,34 @@ sealed trait MultiStringStringValue extends PageValues {
 
 object StartPageValues {
   private val validOptions = List(1, 2, 3)
+  private val discriminator = "startPage"
 
   def validated(value: Int): Either[String, StartPageValues] = {
     if (validOptions.contains(value)) {
       Right(StartPageValues(value))
     } else {
       Left(s"Invalid StartPageValues value $value, valid values ${validOptions.mkString(", ")}")
+    }
+  }
+
+  implicit val encodeStartPageValues: Encoder[StartPageValues] = new Encoder[StartPageValues] {
+    override def apply(startPageValues: StartPageValues): Json = JsonObject(
+      "type" -> Json.fromString(discriminator),
+      "value" -> Json.fromInt(startPageValues.value)
+    ).toJson
+  }
+
+  implicit val decodeStartPageValues: Decoder[StartPageValues] = new Decoder[StartPageValues] {
+    override def apply(c: HCursor): Result[StartPageValues] = {
+      c.get[String]("type") match {
+        case Left(value) => Left(value)
+        case Right(value) =>
+          if (value == discriminator) {
+            c.get[Int]("value").map(value => StartPageValues(value))
+          } else {
+            Left(DecodingFailure("", List.empty))
+          }
+      }
     }
   }
 }
