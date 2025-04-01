@@ -27,7 +27,7 @@ class PageNavigation {
         lastAnswer match {
           case _: ThirdPageAValues => Right(FourthPageB)
           case _ =>
-            Left(s"Unsupported answer type ${lastAnswer.getClass.getSimpleName}, expected SecondPageBValues")
+            Left(s"Unsupported answer type ${lastAnswer.getClass.getSimpleName}, expected ThirdPageAValues")
         }
 
       case StartPage :: SecondPageB :: Nil =>
