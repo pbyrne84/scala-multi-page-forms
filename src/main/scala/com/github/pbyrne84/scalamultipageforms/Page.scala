@@ -20,9 +20,11 @@ sealed trait PageValues {
 
 sealed trait IntValue extends PageValues {
   val value: Int
+
 }
 
 sealed trait StringValue extends PageValues {
+
   val value: String
 }
 
@@ -33,13 +35,29 @@ sealed trait MultiStringStringValue extends PageValues {
 sealed trait JsonPageValues {
   protected val discriminator: String
 
-  protected def createSingleValueEncoder[A <: PageValues](valueCall: (A) => Json) =
+  protected def createSingleValueEncoder[A <: PageValues](valueCall: (A) => Json): Encoder[A] =
     new Encoder[A] {
       override def apply(startPageValues: A): Json = JsonObject(
         "type" -> Json.fromString(discriminator),
         "value" -> valueCall(startPageValues)
       ).toJson
     }
+
+  protected def createSingleValueDecoder[A <: PageValues](valueCall: (HCursor) => Decoder.Result[A]): Decoder[A] =
+    new Decoder[A] {
+      override def apply(c: HCursor): Result[A] = {
+        c.get[String]("type") match {
+          case Left(value) => Left(value)
+          case Right(value) =>
+            if (value == discriminator) {
+              valueCall(c)
+            } else {
+              Left(DecodingFailure("", List.empty))
+            }
+        }
+      }
+    }
+
 }
 
 object StartPageValues extends JsonPageValues {
@@ -57,19 +75,10 @@ object StartPageValues extends JsonPageValues {
   implicit val encodeStartPageValues: Encoder[StartPageValues] =
     createSingleValueEncoder((startPageValues: StartPageValues) => Json.fromInt(startPageValues.value))
 
-  implicit val decodeStartPageValues: Decoder[StartPageValues] = new Decoder[StartPageValues] {
-    override def apply(c: HCursor): Result[StartPageValues] = {
-      c.get[String]("type") match {
-        case Left(value) => Left(value)
-        case Right(value) =>
-          if (value == discriminator) {
-            c.get[Int]("value").map(value => StartPageValues(value))
-          } else {
-            Left(DecodingFailure("", List.empty))
-          }
-      }
+  implicit val decodeStartPageValues: Decoder[StartPageValues] =
+    createSingleValueDecoder { (hCursor: HCursor) =>
+      hCursor.get[Int]("value").map(value => StartPageValues(value))
     }
-  }
 }
 
 case class StartPageValues(value: Int) extends IntValue {
