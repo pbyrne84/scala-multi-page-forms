@@ -1,16 +1,16 @@
 package com.github.pbyrne84.scalamultipageforms
 
 object CompleteValues {
+  import io.circe._
+  import io.circe.generic._
 
-  def toJson(completeValues: CompleteValues) = {
-
-  }
+  implicit val completeValuesEncoder: Encoder.AsObject[CompleteValues] = semiauto.deriveEncoder[CompleteValues]
+  implicit val completeValuesDecoder: Decoder[CompleteValues] = semiauto.deriveDecoder[CompleteValues]
 
 }
+case class CompleteValues(answers: Seq[PageValues]) {
 
-case class CompleteValues(answers: List[PageValues]) {
-
-  val maybeJourneyWithLastValue: Option[(List[Page], PageValues)] = {
+  val maybeJourneyWithLastValue: Option[(Seq[Page], PageValues)] = {
     answers.lastOption match {
       case Some(value) => Some(answers.map(_.page), value)
       case None => None
@@ -18,9 +18,9 @@ case class CompleteValues(answers: List[PageValues]) {
   }
 
   val completedPages: Seq[Page] = answers.map(_.page)
-  val startPageValues: Seq[StartPageValues] = answers.collect { case value: StartPageValues => value }
-  val secondPageAValues: Seq[SecondPageAValues] = answers.collect { case value: SecondPageAValues => value }
-  val secondPageBValues: Seq[SecondPageBValues] = answers.collect { case value: SecondPageBValues => value }
-  val thirdPageAValues: Seq[ThirdPageAValues] = answers.collect { case value: ThirdPageAValues => value }
+  val startPageValues: Option[StartPageValues] = answers.collectFirst { case value: StartPageValues => value }
+  val secondPageAValues: Option[SecondPageAValues] = answers.collectFirst { case value: SecondPageAValues => value }
+  val secondPageBValues: Option[SecondPageBValues] = answers.collectFirst { case value: SecondPageBValues => value }
+  val thirdPageAValues: Option[ThirdPageAValues] = answers.collectFirst { case value: ThirdPageAValues => value }
 
 }

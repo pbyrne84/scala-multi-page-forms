@@ -10,7 +10,7 @@ class PageValuesSpec extends AnyFreeSpecLike with EitherValues {
   import io.circe.syntax._
   import org.scalatest.matchers.should.Matchers._
 
-  private val nonDecisionalTestData = new NonDecisionalTestData
+  private val nonDecisionalTestData = new NonDecisionalValuesTestData
 
   "StartPageValues" - {
     "should encode and decode" in {

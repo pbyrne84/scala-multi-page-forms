@@ -9,7 +9,7 @@ trait PageValuesJsonPairing[A <: PageValues] {
   val json: Json
 }
 
-class NonDecisionalTestData extends EitherValues {
+class NonDecisionalValuesTestData extends EitherValues {
 
   private val all = List(startPage, secondPageA, secondPageB, thirdPageA)
 

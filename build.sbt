@@ -50,6 +50,7 @@ lazy val scalaMultiPageForms = (project in file("."))
       "org.typelevel" %% "cats-core" % "2.13.0",
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
+      "io.circe" %% "circe-generic" % circeVersion,
       "org.scalatest" %% "scalatest" % "3.2.13" % Test
     ),
     publish / skip := true
