@@ -3,7 +3,7 @@ lazy val baseName = "scala-multi-page-forms"
 version := "0.1"
 
 val scala3Version = "3.4.2"
-val scala213Version = "2.13.10"
+val scala213Version = "2.13.16"
 // val scala212Version = "2.12.17"
 lazy val supportedScalaVersions = List(scala3Version, scala213Version)
 

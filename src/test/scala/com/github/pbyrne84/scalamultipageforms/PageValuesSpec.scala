@@ -1,49 +1,56 @@
 package com.github.pbyrne84.scalamultipageforms
 
-import io.circe.parser.parse
+import io.circe.Decoder
+import org.scalactic.source.Position
 import org.scalatest.EitherValues
 import org.scalatest.freespec.AnyFreeSpecLike
 
 class PageValuesSpec extends AnyFreeSpecLike with EitherValues {
 
+  import io.circe.syntax._
   import org.scalatest.matchers.should.Matchers._
 
+  private val nonDecisionalTestData = new NonDecisionalTestData
+
   "StartPageValues" - {
-
-    val startPageJson = parse("""
-        |{
-        |  "type" : "startPage",
-        |  "value" : 1
-        |}
-        |""".stripMargin).value
-
-    import io.circe.syntax._
-    val startPageValues = StartPageValues(1)
-    "should encode to json" in {
-      startPageValues.asJson shouldBe startPageJson
+    "should encode and decode" in {
+      testDecodingAndEncodingOfSingle(nonDecisionalTestData.startPage)
     }
+  }
 
-    "should decode from json" in {
-      startPageJson.as[StartPageValues] shouldBe Right(startPageValues)
+  private def testDecodingAndEncodingOfSingle[A <: PageValues](
+      pageValuesJsonPairing: PageValuesJsonPairing[A]
+  )(implicit position: Position, decoder: Decoder[A]) = {
+    pageValuesJsonPairing.values.toJson shouldBe pageValuesJsonPairing.json
+    pageValuesJsonPairing.json.as[A] shouldBe Right(pageValuesJsonPairing.values)
+  }
+
+  "SecondPageAValues" - {
+    "should encode and decode" in {
+      testDecodingAndEncodingOfSingle(nonDecisionalTestData.secondPageA)
+    }
+  }
+
+  "SecondPageBValues" - {
+    "should encode and decode" in {
+      testDecodingAndEncodingOfSingle(nonDecisionalTestData.secondPageB)
     }
   }
 
   "ThirdPageAValues" - {
-    val thirdPageAJson = parse("""
-        |{
-        |  "type" : "thirdPageA",
-        |  "value" : ["cat","dog"]
-        |}
-        |""".stripMargin).value
+    "should encode and decode" in {
+      testDecodingAndEncodingOfSingle(nonDecisionalTestData.thirdPageA)
+    }
+  }
 
-    import io.circe.syntax._
-    val thirdPageAValues = ThirdPageAValues(List("cat", "dog"))
+  "all values as a list" - {
+
     "should encode to json" in {
-      thirdPageAValues.asJson shouldBe thirdPageAJson
+      nonDecisionalTestData.allValues.asJson shouldBe nonDecisionalTestData.allJsonValues
     }
 
     "should decode from json" in {
-      thirdPageAJson.as[ThirdPageAValues] shouldBe Right(thirdPageAValues)
+      nonDecisionalTestData.allJsonValues.as[List[PageValues]] shouldBe Right(nonDecisionalTestData.allValues)
     }
   }
 

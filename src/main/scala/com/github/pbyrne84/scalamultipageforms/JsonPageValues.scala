@@ -1,12 +1,16 @@
 package com.github.pbyrne84.scalamultipageforms
 
+import com.github.pbyrne84.scalamultipageforms.StartPageValues.{createSingleValueDecoder, createSingleValueEncoder}
 import io.circe.Decoder.Result
 import io.circe.{Decoder, DecodingFailure, Encoder, HCursor, Json, JsonObject}
 
-trait JsonPageValues {
-  protected val discriminator: String
+abstract class JsonPageValues[A <: PageValues](
+    discriminator: String,
+    encodeValueCall: (A) => Json,
+    decodeValueCall: (HCursor) => Decoder.Result[A]
+) {
 
-  protected def createSingleValueEncoder[A <: PageValues](encodeValueCall: (A) => Json): Encoder[A] =
+  protected def createSingleValueEncoder: Encoder[A] =
     new Encoder[A] {
       override def apply(startPageValues: A): Json = JsonObject(
         "type" -> Json.fromString(discriminator),
@@ -14,7 +18,7 @@ trait JsonPageValues {
       ).toJson
     }
 
-  protected def createSingleValueDecoder[A <: PageValues](decodeValueCall: (HCursor) => Decoder.Result[A]): Decoder[A] =
+  protected def createSingleValueDecoder: Decoder[A] =
     new Decoder[A] {
       override def apply(c: HCursor): Result[A] = {
         c.get[String]("type") match {
@@ -33,4 +37,10 @@ trait JsonPageValues {
         }
       }
     }
+
+  implicit val encodeStartPageValues: Encoder[A] =
+    createSingleValueEncoder
+
+  implicit val decodeStartPageValues: Decoder[A] =
+    createSingleValueDecoder
 }
