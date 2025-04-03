@@ -5,8 +5,8 @@ import org.scalatest.freespec.AnyFreeSpecLike
 
 class CompleteValuesSpec extends AnyFreeSpecLike with EitherValues {
 
-  import io.circe.syntax._
   import io.circe.parser._
+  import io.circe.syntax._
   import org.scalatest.matchers.should.Matchers._
 
   private val nonDecisionalValuesTestData = new NonDecisionalValuesTestData
@@ -39,7 +39,7 @@ class CompleteValuesSpec extends AnyFreeSpecLike with EitherValues {
         |}""".stripMargin
     ).value
 
-    val completeValuesWithAllEntries = CompleteValues(nonDecisionalValuesTestData.allValues)
+    val completeValuesWithAllEntries = CompleteValues(nonDecisionalValuesTestData.allValues.toList)
 
     "should encode" in {
       completeValuesWithAllEntries.asJson shouldBe completeValuesJson
@@ -47,6 +47,17 @@ class CompleteValuesSpec extends AnyFreeSpecLike with EitherValues {
 
     "should decode" in {
       completeValuesJson.as[CompleteValues] shouldBe Right(completeValuesWithAllEntries)
+    }
+
+    "maybeAnsweredPageValues" - {
+      "should return None when there are no values" in {
+        CompleteValues(List.empty).maybeAnsweredPageValues shouldBe None
+      }
+
+      "should return NonEmptyList of the values when they exist" in {
+        completeValuesWithAllEntries.maybeAnsweredPageValues shouldBe Some(nonDecisionalValuesTestData.allValues)
+      }
+
     }
   }
 

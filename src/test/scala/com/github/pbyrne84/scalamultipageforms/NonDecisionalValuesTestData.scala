@@ -1,5 +1,6 @@
 package com.github.pbyrne84.scalamultipageforms
 
+import cats.data.NonEmptyList
 import io.circe.Json
 import io.circe.parser.parse
 import org.scalatest.EitherValues
@@ -11,13 +12,16 @@ trait PageValuesJsonPairing[A <: PageValues] {
 
 class NonDecisionalValuesTestData extends EitherValues {
 
-  private val all = List(startPage, secondPageA, secondPageB, thirdPageA)
+  private val firstPageValuesJsonPairing: startPage.type = startPage
+  private val otherPageValuesJsonPairing = List(secondPageA, secondPageB, thirdPageA)
+  private val all = firstPageValuesJsonPairing +: otherPageValuesJsonPairing
 
   val allJsonValues: Json = Json.fromValues(
     all.map(_.json)
   )
 
-  val allValues: Seq[PageValues] = all.map(_.values)
+  val allValues: NonEmptyList[PageValues] =
+    NonEmptyList(firstPageValuesJsonPairing.values, otherPageValuesJsonPairing.map(_.values))
 
   object startPage extends PageValuesJsonPairing[StartPageValues] {
     val values: StartPageValues = StartPageValues(1)
